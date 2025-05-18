@@ -1,18 +1,16 @@
 #pragma once
 
+enum class GameState { MAIN_MENU, GAME, GAME_OVER };
+
 class States {
 public:
-  enum class State { MAIN_MENU, GAME, GAME_OVER };
-
   static States &get_instance();
 
-  State get_state() const;
-  void set_state(State newState);
+  GameState get_state() const;
+  void set_state(GameState newState);
 
-  States(const States &) = delete;
-  States &operator=(const States &) = delete;
+  States();
 
 private:
-  States();
-  State currentState = State::MAIN_MENU;
+  GameState currentState;
 };

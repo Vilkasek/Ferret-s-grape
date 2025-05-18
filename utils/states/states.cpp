@@ -1,16 +1,20 @@
 #include "states.h"
 
-States::States() {}
+static States singletonInstance;
 
 States& States::get_instance() {
-    static States instance;
-    return instance;
+    return singletonInstance;
 }
 
-States::State States::get_state() const {
+States::States() {
+    currentState = GameState::MAIN_MENU;
+}
+
+GameState States::get_state() const {
     return currentState;
 }
 
-void States::set_state(State newState) {
+void States::set_state(GameState newState) {
     currentState = newState;
 }
+

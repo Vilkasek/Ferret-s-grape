@@ -34,28 +34,11 @@ int setup_callbacks(void) {
 }
 
 States statesInstance;
-bool startButtonPressed = false;
 
 void update() {
   SceCtrlData pad;
-  static SceCtrlData prevPad;
 
   sceCtrlReadBufferPositive(&pad, 1);
-
-  bool startButtonReleased =
-      (prevPad.Buttons & PSP_CTRL_START) && !(pad.Buttons & PSP_CTRL_START);
-
-  if (startButtonReleased) {
-    State currentState = statesInstance.get_state();
-    if (currentState == State::MAIN_MENU)
-      statesInstance.set_state(State::GAME);
-    else if (currentState == State::GAME)
-      statesInstance.set_state(State::GAME_OVER);
-    else
-      statesInstance.set_state(State::MAIN_MENU);
-  }
-
-  prevPad = pad;
 
   if (pad.Buttons & PSP_CTRL_HOME) {
     sceKernelExitGame();
@@ -98,7 +81,7 @@ int main() {
   InitWindow(480, 272, "Ferret\'s Grape");
   SetTargetFPS(60);
 
-  statesInstance.set_state(State::MAIN_MENU);
+  statesInstance.set_state(State::GAME);
 
   while (!WindowShouldClose()) {
     update();

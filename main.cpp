@@ -12,7 +12,7 @@
 PSP_MODULE_INFO("Ferret\'s Grape", 0, 0, 1);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
 
-States &states = States::getInstance();
+States &states = States::get_instance();
 
 void update() {
   switch (states.get_state()) {

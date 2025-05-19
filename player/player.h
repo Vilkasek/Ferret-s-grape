@@ -5,17 +5,26 @@
 
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 272
-#define GRAVITY 600.0f
-#define JUMP_FORCE 350.0f
-#define PLAYER_SPEED 200.0f
+#define GRAVITY 800.0f
+#define JUMP_FORCE 300.0f
+#define PLAYER_SPEED 250.0f
 
 typedef struct {
   Vector2 position;
   Vector2 velocity;
+
   float width;
   float height;
+
   bool isJumping;
+
   Texture2D texture;
+
+  float coyoteTime;
+  float coyoteTimer;
+
+  float jumpBufferTime;
+  float jumpBufferTimer;
 } Player;
 
 void player_init(Player *player);

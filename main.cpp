@@ -7,16 +7,33 @@
 #include <pspkernel.h>
 #include <raylib.h>
 
-#define SCREEN_WIDTH 480
-#define SCREEN_HEIGHT 272
-#define GRAVITY 600.0f
-#define JUMP_FORCE 350.0f
-#define PLAYER_SPEED 200.0f
-
 PSP_MODULE_INFO("rayLib", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
 
+int exit_callback(int arg1, int arg2, void *common) {
+  sceKernelExitGame();
+  return 0;
+}
+
+int callback_thread(SceSize args, void *argp) {
+  int cbid = sceKernelCreateCallback("Exit Callback", exit_callback, NULL);
+  sceKernelRegisterExitCallback(cbid);
+  sceKernelSleepThreadCB();
+  return 0;
+}
+
+int setup_callbacks(void) {
+  int thid = sceKernelCreateThread("update_thread", callback_thread, 0x11,
+                                   0xFA0, 0, 0);
+  if (thid >= 0) {
+    sceKernelStartThread(thid, 0, 0);
+  }
+  return thid;
+}
+
 int main(void) {
+  setup_callbacks();
+
   SetConfigFlags(FLAG_VSYNC_HINT);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "PSP Platformówka 2D");
 
@@ -33,13 +50,17 @@ int main(void) {
     float deltaTime = GetFrameTime();
 
     sceCtrlReadBufferPositive(&pad, 1);
+
+    bool left = pad.Buttons & PSP_CTRL_LEFT;
+    bool right = pad.Buttons & PSP_CTRL_RIGHT;
     bool jumpPressed =
         (pad.Buttons & PSP_CTRL_CROSS) && !(prevPad.Buttons & PSP_CTRL_CROSS);
 
-    bool moveLeft = pad.Buttons & PSP_CTRL_LEFT;
-    bool moveRight = pad.Buttons & PSP_CTRL_RIGHT;
+    if (pad.Buttons & PSP_CTRL_HOME) {
+      break;
+    }
 
-    player_update(&player, deltaTime, moveLeft, moveRight, jumpPressed);
+    player_update(&player, deltaTime, left, right, jumpPressed);
 
     BeginDrawing();
     ClearBackground(RAYWHITE);
@@ -51,6 +72,6 @@ int main(void) {
 
   player_unload(&player);
   CloseWindow();
-
+  sceKernelExitGame();
   return 0;
 }

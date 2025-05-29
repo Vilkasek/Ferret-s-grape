@@ -1,5 +1,6 @@
 #define __GLIBC_USE(X) 0
 
+#include "map_loader/map_loader.h"
 #include "player/player.h"
 
 #include <pspctrl.h>
@@ -46,6 +47,11 @@ int main(void) {
   Player player;
   player_init(&player);
 
+  TileMap map;
+  map.tile_size = 32;
+  load_map_from_csv(&map, "maps/level1.csv");
+  load_tileset(&map, "assets/biome1.png");
+
   while (!WindowShouldClose()) {
     float deltaTime = GetFrameTime();
 
@@ -65,6 +71,7 @@ int main(void) {
     BeginDrawing();
     ClearBackground(RAYWHITE);
     player_draw(&player);
+    draw_tilemap(&map);
     EndDrawing();
 
     prevPad = pad;

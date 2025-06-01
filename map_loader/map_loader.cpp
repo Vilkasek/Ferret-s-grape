@@ -12,6 +12,14 @@ void load_map_from_csv(TileMap *map, const char *csv_path) {
 
   char line[1024];
   int row = 0;
+  int max_col = 0;
+
+  for (int i = 0; i < MAX_MAP_HEIGHT; i++) {
+    for (int j = 0; j < MAX_MAP_WIDTH; j++) {
+      map->data[i][j] = 0;
+    }
+  }
+
   while (fgets(line, sizeof(line), file) && row < MAX_MAP_HEIGHT) {
     int col = 0;
     char *token = strtok(line, ",\n");
@@ -20,17 +28,21 @@ void load_map_from_csv(TileMap *map, const char *csv_path) {
       token = strtok(NULL, ",\n");
       col++;
     }
+    if (col > max_col) {
+      max_col = col;
+    }
     row++;
   }
 
-  map->width = MAX_MAP_WIDTH;
-  map->height = MAX_MAP_HEIGHT;
+  map->width = max_col;
+  map->height = row;
 
   map->tile_size = 32;
 
   fclose(file);
-}
 
+  TraceLog(LOG_INFO, "Loaded map: %dx%d tiles", map->width, map->height);
+}
 void load_tileset(TileMap *map, const char *tileset_path) {
   map->tileset = LoadTexture(tileset_path);
 }
@@ -44,7 +56,7 @@ void draw_tilemap(const TileMap *map) {
       if (tile_id == 0)
         continue;
 
-      Rectangle src = {(float)((tile_id - 1) * map->tile_size), 0.0f,
+      Rectangle src = {(float)((tile_id -1) * map->tile_size), 0.0f,
                        (float)map->tile_size, (float)map->tile_size};
 
       Vector2 pos = {(float)(x * map->tile_size), (float)(y * map->tile_size)};
